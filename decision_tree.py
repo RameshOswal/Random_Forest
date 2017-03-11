@@ -4,7 +4,7 @@ Created on Fri Mar 10 01:00:22 2017
 
 @author: Ramesh Oswal
 """
-
+import numpy as np
 #Class to handle the tree node details for the decision tree node
 class decision_tree:
     class decisionnode:
@@ -56,9 +56,9 @@ class decision_tree:
             p = float(results[r]) / len(rows)
             ent = ent - p * log2(p)
         return ent
-    
-    
-    def printtree(self,tree, indent=''):
+
+    def printtree(self,tree,indent=''):
+
         # node is a leaf node
         if tree.results != None:
             print str(tree.results)
@@ -117,9 +117,20 @@ class decision_tree:
         else:
             return self.decisionnode(results=self.uniquecounts(rows))
     def acc_score(self,a,b):
-        return sum(a==b)/float(len(a))
+        return np.sum(a==b)/float(len(a))
     def fit(self,trainX,trainY):
         #train  = trainX + trainY
-        self.tree = self.buildtree(self,train)
-    
+        if type(trainX) != np.ndarray:
+               trainX= np.array(trainX) 
+        if type(trainX) != np.ndarray :
+            trainY = np.array(trainY)
+#        convert trainY into column vector
+        trainY = trainY[np.newaxis].T
+        train = np.concatenate((trainX,trainY),axis = 1)
+        self.tree = self.buildtree(train)
+    def predict(self,X):
+        Y = np.array([])
+        for x in X:
+            Y = np.append(Y,[self.classify(x,self.tree).keys()[0]])
+        return Y
     
